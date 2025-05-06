@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>柯先生の時間表</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+:root {
+  --primary-gradient: linear-gradient(135deg, #4A90E2, #357ABD);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  background-color: #f7f7f7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.banner {
+  background: var(--primary-gradient);
+  padding: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow: hidden;
+  margin-bottom: 15px;
+  box-shadow: var(--card-shadow);
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.banner h1 {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.banner .back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition-smooth);
+}
+
+.banner .back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.schedule-tabs {
+  display: flex;
+  padding: 10px 15px;
+  gap: 10px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.schedule-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: var(--transition-smooth);
+  min-height: 44px;
+}
+
+.tab-btn.active {
+  background: #4A90E2;
+  color: white;
+}
+
+.schedule-content {
+  display: none;
+  padding-bottom: 20px;
+}
+
+.schedule-content.active {
+  display: block;
+}
+
+.schedule-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin: 15px;
+  box-shadow: var(--card-shadow);
+}
+
+.schedule-month {
+  margin: 0 0 20px 0;
+  color: #4A90E2;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.weekday-grid {
+  display: grid;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.day-item {
+  padding: 15px;
+  border-radius: 10px;
+  background: #f8f9fa;
+}
+
+.day-name {
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.time-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.time-block {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.time-block.morning { background: #E3F2FD; }
+.time-block.afternoon { background: #FFF3E0; }
+.time-block.evening { background: #EDE7F6; }
+.time-block.full { background: #E8F5E9; }
+
+.special-times {
+  display: grid;
+  gap: 10px;
+}
+
+.special-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.saturday-section {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.date-note {
+  margin-top: 10px;
+  padding: 8px;
+  background: #E3F2FD;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #4A90E2;
+}
+
+.holiday-plans {
+  display: grid;
+  gap: 10px;
+}
+
+.holiday-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: var(--transition-smooth);
+}
+
+.holiday-item.past-event {
+  opacity: 0.5;
+  background: #f5f5f5;
+}
+
+.holiday-item.current-event {
+  background: var(--primary-gradient);
+  color: white;
+  transform: translateX(5px);
+}
+
+.holiday-item.current-event .date,
+.holiday-item.current-event .weekday,
+.holiday-item.current-event .event {
+  color: white;
+}
+
+.academic-section {
+  margin-bottom: 10px;
+}
+
+.section-header {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.section-header:hover {
+  background: #f8f9fa;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.event-date {
+  color: #4A90E2;
+  font-weight: 600;
+}
+
+.event-weekday {
+  color: #718096;
+  font-size: 0.9em;
+}
+
+.event-title {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.chevron-icon {
+  transition: transform 0.3s ease;
+}
+
+.chevron-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.section-content {
+  background: white;
+  margin-top: 1px;
+  padding: 15px;
+  border-radius: 8px;
+  display: none;
+}
+
+.section-content.expanded {
+  display: block;
+}
+
+.content-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.content-label {
+  font-weight: 500;
+  color: #4a5568;
+  min-width: 70px;
+}
+
+.content-value {
+  color: #2d3748;
+}
+
+.academic-section.past-event {
+  opacity: 0.5;
+}
+
+.academic-section.past-event .section-header {
+  background: #f5f5f5;
+}
+
+.academic-section.past-event .event-date {
+  color: #666;
+}
+
+.academic-section.current-event .section-header {
+  background: var(--primary-gradient);
+}
+
+.academic-section.current-event .section-header:hover {
+  transform: translateX(5px);
+}
+
+.academic-section.current-event .event-date,
+.academic-section.current-event .event-weekday,
+.academic-section.current-event .event-title {
+  color: white;
+}
+
+/* 日概覽樣式 */
+.overview-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin: 15px;
+  box-shadow: var(--card-shadow);
+}
+
+.overview-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #4A90E2;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overview-date {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 5px;
+}
+
+.overview-weekday {
+  font-size: 16px;
+  color: #718096;
+  margin-bottom: 20px;
+}
+
+.schedule-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.schedule-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #E3F2FD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.schedule-time {
+  font-weight: bold;
+  color: #4A90E2;
+}
+
+.event-card {
+  background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.event-card-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.event-card-detail {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.next-event-card {
+  background: linear-gradient(135deg, #9f4b98, #bf6bca);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.view-all-btn {
+  display: block;
+  background: var(--primary-gradient);
+  color: white;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 15px;
+  color: #718096;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* 移動裝置點擊增強 */
+.section-header, .tab-btn, .view-all-btn, .holiday-item {
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+  touch-action: manipulation;
+}
+
+@media (max-width: 768px) {
+  .banner h1 {
+    font-size: 1.3rem;
+  }
+  
+  .schedule-card {
+    padding: 15px;
+    margin: 10px;
+  }
+  
+  .tab-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}
+</style>
+</head>
+<body>
+<div class="banner">
+  <div class="banner-content">
+    <h1>柯先生の時間表</h1>
+    <button class="back-btn" onclick="goBack()">返回</button>
+  </div>
+</div>
+
+<div class="schedule-tabs">
+  <button id="overview-tab" class="tab-btn active" onclick="switchTab('overview')">今日概覽</button>
+  <button id="may-tab" class="tab-btn" onclick="switchTab('may')">2025年5月</button>
+  <button id="june-tab" class="tab-btn" onclick="switchTab('june')">2025年6月</button>
+</div>
+
+<!-- 今日概覽 -->
+<div id="overview" class="schedule-content active">
+  <!-- 內容將由 React 動態生成 -->
+</div>
+
+<!-- 5月內容 -->
+<div id="may" class="schedule-content">
+  <!-- 固定時段卡片 -->
+  <div class="schedule-card">
+    <h3 class="schedule-month">2025年5月 固定時段</h3>
+    <div class="schedule-grid">
+      <div class="weekday-grid">
+        <div class="day-item">
+          <div class="day-name">週一</div>
+          <div class="time-blocks">
+            <div class="time-block morning">
+              <span class="time-icon">🌅</span>
+              <span class="time-text">早上(跟診)</span>
+            </div>
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午</span>
+            </div>
+          </div>
+        </div>
+        <div class="day-item">
+          <div class="day-name">週二</div>
+          <div class="time-blocks">
+            <div class="time-block morning">
+              <span class="time-icon">🌅</span>
+              <span class="time-text">早上</span>
+            </div>
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午 (跟診)</span>
+            </div>
+          </div>
+        </div>
+        <div class="day-item">
+          <div class="day-name">週三、四</div>
+          <div class="time-blocks">
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午</span>
+            </div>
+            <div class="time-block evening">
+              <span class="time-icon">🌙</span>
+              <span class="time-text">晚上</span>
+            </div>
+          </div>
+        </div>
+        <div class="day-item">
+          <div class="day-name">週五</div>
+          <div class="time-blocks">
+            <div class="time-block morning">
+              <span class="time-icon">🌅</span>
+              <span class="time-text">早上</span>
+            </div>
+            <div class="time-block evening">
+              <span class="time-icon">🌙</span>
+              <span class="time-text">晚上(關門留守)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="saturday-section">
+        <div class="day-item">
+          <div class="day-name">
+            指定週六
+            <span class="info-icon">ℹ️</span>
+          </div>
+          <div class="time-blocks">
+            <div class="time-block morning">
+              <span class="time-icon">🌅</span>
+              <span class="time-text">早上</span>
+            </div>
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午</span>
+            </div>
+          </div>
+          <div class="date-note">
+            本月： 5/10、5/24
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 特殊時段卡片 -->
+  <div class="schedule-card special">
+    <h3 class="schedule-month">
+      <span class="alert-icon">⚠️</span>
+      特殊時段
+    </h3>
+    <div class="special-times">
+      <div class="special-item">
+        <span class="date">5/1</span>
+        <span class="weekday">(四)</span>
+        <div class="time-block full">
+          <span class="time-icon">⏰</span>
+          <span class="time-text">勞動節休診</span>
+        </div>
+      </div>
+      <div class="special-item">
+        <span class="date">5/30</span>
+        <span class="weekday">(五)</span>
+        <div class="time-block full">
+          <span class="time-icon">⏰</span>
+          <span class="time-text">全日休診</span>
+        </div>
+      </div>
+      <div class="special-item">
+        <span class="date">5/31</span>
+        <span class="weekday">(六)</span>
+        <div class="time-block full">
+          <span class="time-icon">⏰</span>
+          <span class="time-text">全日休診</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 學術活動卡片 -->
+  <div class="schedule-card academic">
+    <h3 class="schedule-month">
+      <span class="book-icon">📚</span>
+      5月學術活動
+    </h3>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/5</div>
+          <div class="event-weekday">(一)</div>
+          <div class="event-title">院區會議</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">院區主任</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">各院區</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/6</div>
+          <div class="event-weekday">(二)</div>
+          <div class="event-title">VS lecture: 全口重建20年（1）</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/7</div>
+          <div class="event-weekday">(三)</div>
+          <div class="event-title">Endo Journal</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">柯柏銘</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">張文信</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/9</div>
+          <div class="event-weekday">(五)</div>
+          <div class="event-title">VS lecture: 全口重建20年（2）</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/12</div>
+          <div class="event-weekday">(一)</div>
+          <div class="event-title">VS lecture: 全口重建20年（3）</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/13</div>
+          <div class="event-weekday">(二)</div>
+          <div class="event-title">VS lecture: 全口重建20年（4）</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/14</div>
+          <div class="event-weekday">(三)</div>
+          <div class="event-title">牙科大會</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">余明元</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部2樓</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/16</div>
+          <div class="event-weekday">(五)</div>
+          <div class="event-title">VS lecture: 全口重建20年（5）</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/20</div>
+          <div class="event-weekday">(二)</div>
+          <div class="event-title">家庭牙科讀書會：Esthetic Dentistry（Chapter 1–7-1）</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">李昕容</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/21</div>
+          <div class="event-weekday">(三)</div>
+          <div class="event-title">Pedo Seminar: Space Maintainer</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">李學鴻</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">蘇若梅</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/23</div>
+          <div class="event-weekday">(五)</div>
+          <div class="event-title"> 廠商演講：威仕-新一代的黏著劑</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">廠商</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">廠商</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/26</div>
+          <div class="event-weekday">(一)</div>
+          <div class="event-title">全人牙科治療講座 Prostho CC</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">蔡欣庭</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">吳成才</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/27</div>
+          <div class="event-weekday">(二)</div>
+          <div class="event-title">Pedo Journal</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">蔡君瑋</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">林軒竹</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">5/28</div>
+          <div class="event-weekday">(三)</div>
+          <div class="event-title">Endo Seminar: (2016) Restoration of Root Canal-Treated Teeth – An Adhesive Dentistry Perspective, Jorge Perdigão, Chapter 7, 8, 9</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">洪志翔</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">廖國翰</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 假日計畫卡片 -->
+  <div class="schedule-card holiday">
+    <h3 class="schedule-month">5月假日計畫</h3>
+    <div class="holiday-plans">
+      <div class="holiday-item">
+        <span class="calendar-icon">📅</span>
+        <span class="date">5/3-5/4</span>
+        <span class="weekday">(六-日)</span>
+        <span class="event">八斗子快活趣</span>
+      </div>
+      
+      <div class="holiday-item">
+        <span class="calendar-icon">📅</span>
+        <span class="date">5/17-5/18</span>
+        <span class="weekday">(六-日)</span>
+        <span class="event">北台灣逍遙遊</span>
+      </div>
+      
+      <div class="holiday-item">
+        <span class="calendar-icon">📅</span>
+        <span class="date">5/25</span>
+        <span class="weekday">(日)</span>
+        <span class="event">秀傳員旅南投趣</span>
+      </div>
+      
+      <div class="holiday-item">
+        <span class="calendar-icon">📅</span>
+        <span class="date">5/31-6/1</span>
+        <span class="weekday">(六-日)</span>
+        <span class="event">柯先生生日南投臺南趣</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6月內容 -->
+<div id="june" class="schedule-content">
+  <div class="schedule-card">
+    <h3 class="schedule-month">2025年6月 固定時段</h3>
+    <div class="schedule-grid">
+      <div class="weekday-grid">
+        <div class="day-item">
+          <div class="day-name">週一</div>
+          <div class="time-blocks">
+            <div class="time-block morning">
+              <span class="time-icon">🌅</span>
+              <span class="time-text">早上(跟診)</span>
+            </div>
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午</span>
+            </div>
+          </div>
+        </div>
+        <div class="day-item">
+          <div class="day-name">週二</div>
+          <div class="time-blocks">
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午 (跟診)</span>
+            </div>
+            <div class="time-block evening">
+              <span class="time-icon">🌙</span>
+              <span class="time-text">晚上</span>
+            </div>
+          </div>
+        </div>
+        <div class="day-item">
+          <div class="day-name">週三</div>
+          <div class="time-blocks">
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午</span>
+            </div>
+            <div class="time-block evening">
+              <span class="time-icon">🌙</span>
+              <span class="time-text">晚上</span>
+            </div>
+          </div>
+        </div>
+        <div class="day-item">
+          <div class="day-name">週四</div>
+          <div class="time-blocks">
+            <div class="time-block morning">
+              <span class="time-icon">🌅</span>
+              <span class="time-text">早上</span>
+            </div>
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午</span>
+            </div>
+          </div>
+        </div>
+        <div class="day-item">
+          <div class="day-name">週五</div>
+          <div class="time-blocks">
+            <div class="time-block morning">
+              <span class="time-icon">🌅</span>
+              <span class="time-text">早上</span>
+            </div>
+            <div class="time-block evening">
+              <span class="time-icon">🌙</span>
+              <span class="time-text">晚上(關門留守)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="saturday-section">
+        <div class="day-item">
+          <div class="day-name">
+            指定週六
+            <span class="info-icon">ℹ️</span>
+          </div>
+          <div class="time-blocks">
+            <div class="time-block morning">
+              <span class="time-icon">🌅</span>
+              <span class="time-text">早上</span>
+            </div>
+            <div class="time-block afternoon">
+              <span class="time-icon">🌇</span>
+              <span class="time-text">下午</span>
+            </div>
+          </div>
+          <div class="date-note">
+            本月： 6/7、6/21
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 特殊時段卡片 -->
+  <div class="schedule-card special">
+    <h3 class="schedule-month">
+      <span class="alert-icon">⚠️</span>
+      特殊時段
+    </h3>
+    <div class="special-times">
+      <div class="special-item">
+        <span class="date">6/14</span>
+        <span class="weekday">(六)</span>
+        <div class="time-block full">
+          <span class="time-icon">⏰</span>
+          <span class="time-text">全日休診</span>
+        </div>
+      </div>
+      <div class="special-item">
+        <span class="date">6/24</span>
+        <span class="weekday">(二)</span>
+        <div class="time-block morning">
+          <span class="time-icon">⏰</span>
+          <span class="time-text">早上回診皮膚科</span>
+        </div>
+      </div>
+      <div class="special-item">
+        <span class="date">6/28</span>
+        <span class="weekday">(六)</span>
+        <div class="time-block full">
+          <span class="time-icon">⏰</span>
+          <span class="time-text">全日休診</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  <!-- 學術活動卡片 -->
+  <div class="schedule-card academic">
+    <h3 class="schedule-month">
+      <span class="book-icon">📚</span>
+      6月學術活動
+    </h3>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/2</div>
+          <div class="event-weekday">(一)</div>
+          <div class="event-title">院區會議</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">院區主任</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">各院區</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/4</div>
+          <div class="event-weekday">(三)</div>
+          <div class="event-title">Endo Journal</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">蔡君瑋</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">張文信</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/11</div>
+          <div class="event-weekday">(三)</div>
+          <div class="event-title">牙科大會</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部2樓</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/13</div>
+          <div class="event-weekday">(五)</div>
+          <div class="event-title">家庭牙科讀書會: Esthetic Dentistry (chapter17-1)</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">李昕容</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/17</div>
+          <div class="event-weekday">(二)</div>
+          <div class="event-title">全人牙科治療講座 Combine meeting</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">陳柔岑 陳冠偉</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/18</div>
+          <div class="event-weekday">(三)</div>
+          <div class="event-title">外賓演講:舒眠麻醉</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">麻醉科 黃仁宣</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">蘇若梅</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/20</div>
+          <div class="event-weekday">(五)</div>
+          <div class="event-title">Perio C.C & Implant Lecture</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">劉德豐 蔡欣展</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">朱耕廷</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/23</div>
+          <div class="event-weekday">(一)</div>
+          <div class="event-title">全人牙科治療講座 Prostho CC</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">李學鴻</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">吳成才</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/24</div>
+          <div class="event-weekday">(二)</div>
+          <div class="event-title">Pedo Journal</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">賴嘉荷</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">林軒竹</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="academic-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title-row">
+          <div class="event-date">6/25</div>
+          <div class="event-weekday">(三)</div>
+          <div class="event-title">Endo Seminar: (2016) Restoration of Root Canal-Treated Teeth - An Adhesive Dentistry Perspective, Jorge Perdigão Chapter 7,8,9</div>
+        </div>
+        <div class="chevron-icon">▼</div>
+      </div>
+      <div class="section-content">
+        <div class="content-row">
+          <div class="content-label">報告人：</div>
+          <div class="content-value">李宜芳</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">主持人：</div>
+          <div class="content-value">廖國翰</div>
+        </div>
+        <div class="content-row">
+          <div class="content-label">地點：</div>
+          <div class="content-value">本部五樓會議室</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 假日計畫卡片 -->
+  <div class="schedule-card holiday">
+    <h3 class="schedule-month">6月假日計畫</h3>
+    <div class="holiday-plans">
+      <div class="holiday-item">
+        <span class="calendar-icon">📅</span>
+        <span class="date">6/14</span>
+        <span class="weekday">(六)</span>
+        <span class="event">回台中看診所</span>
+      </div>
+      
+      <div class="holiday-item">
+        <span class="calendar-icon">📅</span>
+        <span class="date">6/28-6/29</span>
+        <span class="weekday">(六-日)</span>
+        <span class="event">週末休閒活動</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/babel">
+// 今日概覽 React 組件
+const DailyOverview = () => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const weekdayNames = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+  
+  // 從 HTML 中獲取學術活動
+  const getAcademicEvents = () => {
+    const events = [];
+    const month = today.getMonth() + 1; // JavaScript 月份從 0 開始
+    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    
+    if (!monthContent) return [];
+    
+    const academicSections = monthContent.querySelectorAll('.academic-section');
+    academicSections.forEach(section => {
+      const dateText = section.querySelector('.event-date').textContent;
+      const [eventMonth, eventDay] = dateText.split('/').map(num => parseInt(num));
+      const title = section.querySelector('.event-title').textContent;
+      
+      // 檢查是否為當天
+      if (eventMonth === month && eventDay === today.getDate()) {
+        let presenter = '';
+        let location = '';
+        
+        const content = section.querySelector('.section-content');
+        if (content) {
+          const presenterRow = content.querySelector('.content-row:nth-child(1)');
+          if (presenterRow) {
+            presenter = presenterRow.querySelector('.content-value').textContent;
+          }
+          
+          const locationRow = content.querySelector('.content-row:nth-child(n+2)');
+          if (locationRow) {
+            location = locationRow.querySelector('.content-value').textContent;
+          }
+        }
+        
+        events.push({
+          title,
+          presenter,
+          location
+        });
+      }
+    });
+    
+    return events;
+  };
+  
+  // 從 HTML 中獲取假日活動
+  const getHolidayEvents = () => {
+    const month = today.getMonth() + 1;
+    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    
+    if (!monthContent) return [];
+    
+    const holidayItems = monthContent.querySelectorAll('.holiday-item');
+    const todayEvents = [];
+    
+    holidayItems.forEach(item => {
+      const dateText = item.querySelector('.date').textContent;
+      const eventText = item.querySelector('.event').textContent;
+      
+      // 處理日期區間 (例如 5/3-5/4)
+      if (dateText.includes('-')) {
+        const [startDateStr, endDateStr] = dateText.split('-');
+        let startMonth, startDay, endMonth, endDay;
+        
+        if (startDateStr.includes('/')) {
+          [startMonth, startDay] = startDateStr.split('/').map(n => parseInt(n));
+        }
+        
+        if (endDateStr.includes('/')) {
+          [endMonth, endDay] = endDateStr.split('/').map(n => parseInt(n));
+        } else {
+          endMonth = startMonth;
+          endDay = parseInt(endDateStr);
+        }
+        
+        // 檢查今天是否在區間內
+        if (month === startMonth && today.getDate() >= startDay && 
+            (month < endMonth || (month === endMonth && today.getDate() <= endDay))) {
+          todayEvents.push(eventText);
+        }
+      } else {
+        // 單一日期
+        const [eventMonth, eventDay] = dateText.split('/').map(n => parseInt(n));
+        if (month === eventMonth && today.getDate() === eventDay) {
+          todayEvents.push(eventText);
+        }
+      }
+    });
+    
+    return todayEvents;
+  };
+  
+  // 獲取當天的診所時段
+  const getTodaySchedule = () => {
+    // 檢查是否為特殊時段
+    const month = today.getMonth() + 1;
+    const date = today.getDate();
+    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    
+    if (!monthContent) return [];
+    
+    // 檢查特殊時段
+    const specialItems = monthContent.querySelectorAll('.special-item');
+    for (let item of specialItems) {
+      const itemDate = item.querySelector('.date').textContent;
+      const [itemMonth, itemDay] = itemDate.split('/').map(n => parseInt(n));
+      
+      if (itemMonth === month && itemDay === date) {
+        const timeBlock = item.querySelector('.time-block');
+        if (timeBlock.classList.contains('full')) {
+          return []; // 全日休診
+        }
+        
+        const timeText = timeBlock.querySelector('.time-text').textContent;
+        if (timeText.includes('休診')) {
+          return []; // 休診
+        }
+        
+        return [timeText.replace(/[()]/g, '')];
+      }
+    }
+    
+    // 檢查是否為指定週六
+    if (dayOfWeek === 6) {
+      const saturdaySection = monthContent.querySelector('.saturday-section');
+      if (saturdaySection) {
+        const dateNote = saturdaySection.querySelector('.date-note');
+        if (dateNote) {
+          const saturdayDates = dateNote.textContent.match(/\d+\/\d+/g) || [];
+          for (let saturdayDate of saturdayDates) {
+            const [satMonth, satDay] = saturdayDate.split('/').map(n => parseInt(n));
+            if (month === satMonth && date === satDay) {
+              return ['早上', '下午'];
+            }
+          }
+        }
+      }
+      return []; // 非指定週六，休診
+    }
+    
+    // 一般工作日
+    switch (dayOfWeek) {
+      case 0: // 週日
+        return [];
+      case 1: // 週一
+        return ['早上(跟診)', '下午'];
+      case 2: // 週二
+        if (month === 5) {
+          return ['早上', '下午(跟診)'];
+        } else {
+          return ['下午(跟診)', '晚上'];
+        }
+      case 3: // 週三
+        if (month === 5) {
+          return ['下午', '晚上'];
+        } else {
+          return ['下午', '晚上'];
+        }
+      case 4: // 週四
+        if (month === 5) {
+          return ['下午', '晚上'];
+        } else {
+          return ['早上', '下午'];
+        }
+      case 5: // 週五
+        return ['早上', '晚上(關門留守)'];
+      default:
+        return [];
+    }
+  };
+  
+  // 獲取下一個學術活動
+  const getNextAcademicEvent = () => {
+    const month = today.getMonth() + 1;
+    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    
+    if (!monthContent) return null;
+    
+    const academicSections = Array.from(monthContent.querySelectorAll('.academic-section'));
+    let nextEvent = null;
+    let minDaysAway = Infinity;
+    
+    academicSections.forEach(section => {
+      const dateText = section.querySelector('.event-date').textContent;
+      const [eventMonth, eventDay] = dateText.split('/').map(num => parseInt(num));
+      
+      // 計算距離今天的天數
+      const eventDate = new Date(today.getFullYear(), eventMonth - 1, eventDay);
+      const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const diffTime = eventDate - todayDate;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      // 只考慮未來的事件
+      if (diffDays > 0 && diffDays < minDaysAway) {
+        minDaysAway = diffDays;
+        const title = section.querySelector('.event-title').textContent;
+        const weekday = section.querySelector('.event-weekday').textContent;
+        
+        nextEvent = {
+          title,
+          date: `${eventMonth}/${eventDay}`,
+          weekday,
+          daysAway: diffDays
+        };
+      }
+    });
+    
+    return nextEvent;
+  };
+  
+  // 獲取下一個假日計畫
+  const getNextHolidayPlan = () => {
+    const month = today.getMonth() + 1;
+    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    
+    if (!monthContent) return null;
+    
+    const holidayItems = Array.from(monthContent.querySelectorAll('.holiday-item'));
+    let nextHoliday = null;
+    let minDaysAway = Infinity;
+    
+    holidayItems.forEach(item => {
+      const dateText = item.querySelector('.date').textContent;
+      const eventText = item.querySelector('.event').textContent;
+      
+      let startMonth, startDay;
+      
+      if (dateText.includes('-')) {
+        // 處理日期區間
+        const [startDateStr] = dateText.split('-');
+        [startMonth, startDay] = startDateStr.split('/').map(n => parseInt(n));
+      } else {
+        // 單一日期
+        [startMonth, startDay] = dateText.split('/').map(n => parseInt(n));
+      }
+      
+      // 計算距離今天的天數
+      const eventDate = new Date(today.getFullYear(), startMonth - 1, startDay);
+      const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const diffTime = eventDate - todayDate;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      // 只考慮未來的事件
+      if (diffDays > 0 && diffDays < minDaysAway) {
+        minDaysAway = diffDays;
+        const weekday = item.querySelector('.weekday').textContent;
+        
+        nextHoliday = {
+          title: eventText,
+          date: dateText,
+          weekday,
+          daysAway: diffDays
+        };
+      }
+    });
+    
+    return nextHoliday;
+  };
+  
+  const academicEvents = getAcademicEvents();
+  const holidayEvents = getHolidayEvents();
+  const schedule = getTodaySchedule();
+  const nextAcademicEvent = getNextAcademicEvent();
+  const nextHolidayPlan = getNextHolidayPlan();
+  
+  const formatDate = (date) => {
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+  };
+  
+  return (
+    <div className="daily-overview">
+      {/* 日期顯示 */}
+      <div className="overview-card">
+        <div className="overview-date">{formatDate(today)}</div>
+        <div className="overview-weekday">{weekdayNames[dayOfWeek]}</div>
+      </div>
+      
+      {/* 今日班表 */}
+      <div className="overview-card">
+        <div className="overview-title">
+          <span>📋</span>
+          <span>今日班表</span>
+        </div>
+        {schedule.length > 0 ? (
+          <div className="schedule-list">
+            {schedule.map((time, index) => (
+              <div key={index} className="schedule-item">
+                <div className="schedule-icon">
+                  {time.includes('早上') ? '🌅' : 
+                   time.includes('下午') ? '🌇' : '🌙'}
+                </div>
+                <div className="schedule-time">{time}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-message">今日休診</div>
+        )}
+      </div>
+      
+      {/* 今日學術活動 */}
+      {academicEvents.length > 0 && (
+        <div className="overview-card">
+          <div className="overview-title">
+            <span>📚</span>
+            <span>今日學術活動</span>
+          </div>
+          <div className="event-list">
+            {academicEvents.map((event, index) => (
+              <div key={index} className="event-card">
+                <div className="event-card-title">{event.title}</div>
+                {event.presenter && (
+                  <div className="event-card-detail">報告人：{event.presenter}</div>
+                )}
+                {event.location && (
+                  <div className="event-card-detail">地點：{event.location}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* 今日假日計畫 */}
+      {holidayEvents.length > 0 && (
+        <div className="overview-card">
+          <div className="overview-title">
+            <span>🏖️</span>
+            <span>今日假日計畫</span>
+          </div>
+          <div className="event-list">
+            {holidayEvents.map((event, index) => (
+              <div key={index} className="event-card">
+                <div className="event-card-title">{event}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* 下一個學術活動 */}
+      {nextAcademicEvent && (
+        <div className="overview-card">
+          <div className="overview-title">
+            <span>📝</span>
+            <span>下一個學術活動</span>
+          </div>
+          <div className="next-event-card">
+            <div className="event-card-title">{nextAcademicEvent.title}</div>
+            <div className="event-card-detail">
+              時間：{nextAcademicEvent.date} {nextAcademicEvent.weekday}
+            </div>
+            <div className="event-card-detail">
+              還有 {nextAcademicEvent.daysAway} 天
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* 下一個假日計畫 */}
+      {nextHolidayPlan && (
+        <div className="overview-card">
+          <div className="overview-title">
+            <span>🗓️</span>
+            <span>下一個假日計畫</span>
+          </div>
+          <div className="next-event-card">
+            <div className="event-card-title">{nextHolidayPlan.title}</div>
+            <div className="event-card-detail">
+              時間：{nextHolidayPlan.date} {nextHolidayPlan.weekday}
+            </div>
+            <div className="event-card-detail">
+              還有 {nextHolidayPlan.daysAway} 天
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// 渲染今日概覽
+ReactDOM.createRoot(document.getElementById('overview')).render(<DailyOverview />);
+</script>
+
+<script>
+// 切換分頁
+function switchTab(tabId) {
+  // 隱藏所有內容
+  document.querySelectorAll('.schedule-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // 重設所有標籤按鈕
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // 顯示選中的內容
+  document.getElementById(tabId).classList.add('active');
+  
+  // 激活對應的標籤按鈕
+  document.getElementById(tabId + '-tab').classList.add('active');
+  
+  // 如果切換到月份標籤，更新學術活動和假期狀態
+  if (tabId === 'may' || tabId === 'june') {
+    checkPastEvents();
+    checkHolidayEvents();
+  }
+}
+
+// 展開/收合學術活動詳情
+function toggleSection(header) {
+  const content = header.nextElementSibling;
+  const chevron = header.querySelector('.chevron-icon');
+  
+  content.classList.toggle('expanded');
+  chevron.classList.toggle('expanded');
+  
+  if (content.classList.contains('expanded')) {
+    chevron.style.transform = 'rotate(180deg)';
+  } else {
+    chevron.style.transform = 'rotate(0deg)';
+  }
+}
+
+// 檢查過去的事件
+function checkPastEvents() {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  const currentDate = today.getDate();
+  
+  // 獲取當前顯示的月份
+  const activeMonth = document.querySelector('.schedule-content.active');
+  if (!activeMonth) return;
+  
+  // 檢查學術活動
+  const academicSections = activeMonth.querySelectorAll('.academic-section');
+  academicSections.forEach(section => {
+    const dateText = section.querySelector('.event-date').textContent;
+    const [month, day] = dateText.split('/').map(num => parseInt(num));
+    
+    section.classList.remove('past-event', 'current-event');
+    
+    // 檢查是否為當天
+    if (month === currentMonth && day === currentDate) {
+      section.classList.add('current-event');
+    } 
+    // 檢查是否為過去的日期
+    else if (month < currentMonth || (month === currentMonth && day < currentDate)) {
+      section.classList.add('past-event');
+    }
+  });
+}
+
+// 檢查假日事件
+function checkHolidayEvents() {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  const currentDate = today.getDate();
+  
+  // 獲取當前顯示的月份
+  const activeMonth = document.querySelector('.schedule-content.active');
+  if (!activeMonth) return;
+  
+  // 檢查假日計畫
+  const holidayItems = activeMonth.querySelectorAll('.holiday-item');
+  holidayItems.forEach(item => {
+    const dateText = item.querySelector('.date').textContent;
+    
+    item.classList.remove('past-event', 'current-event');
+    
+    // 處理日期區間 (例如 5/3-5/4)
+    if (dateText.includes('-')) {
+      const [startDateStr, endDateStr] = dateText.split('-');
+      let startMonth, startDay, endMonth, endDay;
+      
+      if (startDateStr.includes('/')) {
+        [startMonth, startDay] = startDateStr.split('/').map(n => parseInt(n));
+      }
+      
+      if (endDateStr.includes('/')) {
+        [endMonth, endDay] = endDateStr.split('/').map(n => parseInt(n));
+      } else {
+        endMonth = startMonth;
+        endDay = parseInt(endDateStr);
+      }
+      
+      // 檢查是否為當前日期
+      const isCurrentEvent = 
+        (currentMonth === startMonth && currentDate >= startDay) && 
+        (currentMonth === endMonth && currentDate <= endDay);
+      
+      // 檢查是否為過去日期
+      const isPastEvent = 
+        (currentMonth > endMonth) || 
+        (currentMonth === endMonth && currentDate > endDay);
+      
+      if (isCurrentEvent) {
+        item.classList.add('current-event');
+      } else if (isPastEvent) {
+        item.classList.add('past-event');
+      }
+    } else {
+      // 單一日期
+      const [month, day] = dateText.split('/').map(n => parseInt(n));
+      
+      // 檢查是否為當天
+      if (month === currentMonth && day === currentDate) {
+        item.classList.add('current-event');
+      } 
+      // 檢查是否為過去的日期
+      else if (month < currentMonth || (month === currentMonth && day < currentDate)) {
+        item.classList.add('past-event');
+      }
+    }
+  });
+}
+
+// 返回主頁
+function goBack() {
+  window.location.href = "https://goosebara.github.io/mrkd-life/";
+}
+
+// 頁面載入時初始化
+document.addEventListener('DOMContentLoaded', function() {
+  // 預設顯示當日概覽
+  switchTab('overview');
+  
+  // 添加觸摸支援
+  document.querySelectorAll('.section-header').forEach(header => {
+    header.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      toggleSection(this);
+    });
+  });
+  
+  document.querySelectorAll('.tab-btn').forEach(button => {
+    button.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      const tabId = this.id.replace('-tab', '');
+      switchTab(tabId);
+    });
+  });
+});
+</script>
+</body>
+</html>
