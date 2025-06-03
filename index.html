@@ -462,7 +462,7 @@ body {
 
 <div class="schedule-tabs">
   <button id="overview-tab" class="tab-btn active" onclick="switchTab('overview')">今日概覽</button>
-  <button id="may-tab" class="tab-btn" onclick="switchTab('may')">2025年5月</button>
+  <button id="july-tab" class="tab-btn" onclick="switchTab('july')">2025年7月</button>
   <button id="june-tab" class="tab-btn" onclick="switchTab('june')">2025年6月</button>
 </div>
 
@@ -471,124 +471,103 @@ body {
   <!-- 內容將由 React 動態生成 -->
 </div>
 
-<!-- 5月內容 -->
-<div id="may" class="schedule-content">
+<!-- 7月內容 -->
+<div id="july" class="schedule-content">
   <!-- 固定時段卡片 -->
   <div class="schedule-card">
-    <h3 class="schedule-month">2025年5月 固定時段</h3>
-    <div class="schedule-grid">
-      <div class="weekday-grid">
-        <div class="day-item">
-          <div class="day-name">週一</div>
-          <div class="time-blocks">
-            <div class="time-block morning">
-              <span class="time-icon">🌅</span>
-              <span class="time-text">早上(跟診)</span>
-            </div>
-            <div class="time-block afternoon">
-              <span class="time-icon">🌇</span>
-              <span class="time-text">下午</span>
-            </div>
+  <h3 class="schedule-month">2025年7月 固定時段</h3>
+  <div class="schedule-grid">
+    <div class="weekday-grid">
+      <div class="day-item">
+        <div class="day-name">週一</div>
+        <div class="time-blocks">
+          <div class="time-block morning">
+            <span class="time-icon">🌅</span>
+            <span class="time-text">早上(跟診)</span>
           </div>
-        </div>
-        <div class="day-item">
-          <div class="day-name">週二</div>
-          <div class="time-blocks">
-            <div class="time-block morning">
-              <span class="time-icon">🌅</span>
-              <span class="time-text">早上</span>
-            </div>
-            <div class="time-block afternoon">
-              <span class="time-icon">🌇</span>
-              <span class="time-text">下午 (跟診)</span>
-            </div>
-          </div>
-        </div>
-        <div class="day-item">
-          <div class="day-name">週三、四</div>
-          <div class="time-blocks">
-            <div class="time-block afternoon">
-              <span class="time-icon">🌇</span>
-              <span class="time-text">下午</span>
-            </div>
-            <div class="time-block evening">
-              <span class="time-icon">🌙</span>
-              <span class="time-text">晚上</span>
-            </div>
-          </div>
-        </div>
-        <div class="day-item">
-          <div class="day-name">週五</div>
-          <div class="time-blocks">
-            <div class="time-block morning">
-              <span class="time-icon">🌅</span>
-              <span class="time-text">早上</span>
-            </div>
-            <div class="time-block evening">
-              <span class="time-icon">🌙</span>
-              <span class="time-text">晚上(關門留守)</span>
-            </div>
+          <div class="time-block afternoon">
+            <span class="time-icon">🌇</span>
+            <span class="time-text">下午</span>
           </div>
         </div>
       </div>
-      
-      <div class="saturday-section">
-        <div class="day-item">
-          <div class="day-name">
-            指定週六
-            <span class="info-icon">ℹ️</span>
+      <div class="day-item">
+        <div class="day-name">週二</div>
+        <div class="time-blocks">
+          <div class="time-block afternoon">
+            <span class="time-icon">🌇</span>
+            <span class="time-text">下午(跟診)</span>
           </div>
-          <div class="time-blocks">
-            <div class="time-block morning">
-              <span class="time-icon">🌅</span>
-              <span class="time-text">早上</span>
-            </div>
-            <div class="time-block afternoon">
-              <span class="time-icon">🌇</span>
-              <span class="time-text">下午</span>
-            </div>
+          <div class="time-block evening">
+            <span class="time-icon">🌙</span>
+            <span class="time-text">晚上</span>
           </div>
-          <div class="date-note">
-            本月： 5/10、5/24
+        </div>
+      </div>
+      <div class="day-item">
+        <div class="day-name">週三</div>
+        <div class="time-blocks">
+          <div class="time-block afternoon">
+            <span class="time-icon">🌇</span>
+            <span class="time-text">下午</span>
+          </div>
+          <div class="time-block evening">
+            <span class="time-icon">🌙</span>
+            <span class="time-text">晚上</span>
+          </div>
+        </div>
+      </div>
+      <div class="day-item">
+        <div class="day-name">週四</div>
+        <div class="time-blocks">
+          <div class="time-block morning">
+            <span class="time-icon">🌅</span>
+            <span class="time-text">早上</span>
+          </div>
+          <div class="time-block afternoon">
+            <span class="time-icon">🌇</span>
+            <span class="time-text">下午</span>
+          </div>
+        </div>
+      </div>
+      <div class="day-item">
+        <div class="day-name">週五</div>
+        <div class="time-blocks">
+          <div class="time-block morning">
+            <span class="time-icon">🌅</span>
+            <span class="time-text">早上</span>
+          </div>
+          <div class="time-block evening">
+            <span class="time-icon">🌙</span>
+            <span class="time-text">晚上(關門留守)</span>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  
-  <!-- 特殊時段卡片 -->
-  <div class="schedule-card special">
-    <h3 class="schedule-month">
-      <span class="alert-icon">⚠️</span>
-      特殊時段
-    </h3>
-    <div class="special-times">
-      <div class="special-item">
-        <span class="date">5/1</span>
-        <span class="weekday">(四)</span>
-        <div class="time-block full">
-          <span class="time-icon">⏰</span>
-          <span class="time-text">勞動節休診</span>
+    
+    <div class="saturday-section">
+      <div class="day-item">
+        <div class="day-name">
+          指定週六
+          <span class="info-icon">ℹ️</span>
         </div>
-      </div>
-      <div class="special-item">
-        <span class="date">5/30</span>
-        <span class="weekday">(五)</span>
-        <div class="time-block full">
-          <span class="time-icon">⏰</span>
-          <span class="time-text">全日休診</span>
+        <div class="time-blocks">
+          <div class="time-block morning">
+            <span class="time-icon">🌅</span>
+            <span class="time-text">早上</span>
+          </div>
+          <div class="time-block afternoon">
+            <span class="time-icon">🌇</span>
+            <span class="time-text">下午</span>
+          </div>
         </div>
-      </div>
-      <div class="special-item">
-        <span class="date">5/31</span>
-        <span class="weekday">(六)</span>
-        <div class="time-block full">
-          <span class="time-icon">⏰</span>
-          <span class="time-text">全日休診</span>
+        <div class="date-note">
+          本月： 7/5、7/19
         </div>
       </div>
     </div>
   </div>
+</div>
   
   <!-- 學術活動卡片 -->
   <div class="schedule-card academic">
@@ -1390,7 +1369,7 @@ const DailyOverview = () => {
   const getAcademicEvents = () => {
     const events = [];
     const month = today.getMonth() + 1; // JavaScript 月份從 0 開始
-    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    const monthContent = document.getElementById(month === 6 ? 'june' : 'july');
     
     if (!monthContent) return [];
     
@@ -1789,7 +1768,7 @@ function switchTab(tabId) {
   document.getElementById(tabId + '-tab').classList.add('active');
   
   // 如果切換到月份標籤，更新學術活動和假期狀態
-  if (tabId === 'may' || tabId === 'june') {
+  if (tabId === 'july' || tabId === 'june') {
     checkPastEvents();
     checkHolidayEvents();
   }
