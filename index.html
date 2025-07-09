@@ -475,7 +475,7 @@ body {
 <div class="schedule-tabs">
   <button id="overview-tab" class="tab-btn active" onclick="switchTab('overview')">今日概覽</button>
   <button id="july-tab" class="tab-btn" onclick="switchTab('july')">2025年7月</button>
-  <button id="june-tab" class="tab-btn" onclick="switchTab('june')">2025年6月</button>
+  <button id="august-tab" class="tab-btn" onclick="switchTab('august')">2025年8月</button>
 </div>
 
 <!-- 今日概覽 -->
@@ -909,10 +909,10 @@ body {
   </div>
 </div>
 
-<!-- 6月內容 -->
-<div id="june" class="schedule-content">
+<!-- 8月內容 -->
+<div id="august" class="schedule-content">
   <div class="schedule-card">
-    <h3 class="schedule-month">2025年6月 固定時段</h3>
+    <h3 class="schedule-month">2025年8月 固定時段</h3>
     <div class="schedule-grid">
       <div class="weekday-grid">
         <div class="day-item">
@@ -920,7 +920,7 @@ body {
           <div class="time-blocks">
             <div class="time-block morning">
               <span class="time-icon">🌅</span>
-              <span class="time-text">早上(跟診)</span>
+              <span class="time-text">早上</span>
             </div>
             <div class="time-block afternoon">
               <span class="time-icon">🌇</span>
@@ -933,7 +933,7 @@ body {
           <div class="time-blocks">
             <div class="time-block afternoon">
               <span class="time-icon">🌇</span>
-              <span class="time-text">下午 (跟診)</span>
+              <span class="time-text">下午</span>
             </div>
             <div class="time-block evening">
               <span class="time-icon">🌙</span>
@@ -950,7 +950,7 @@ body {
             </div>
             <div class="time-block evening">
               <span class="time-icon">🌙</span>
-              <span class="time-text">晚上</span>
+              <span class="time-text">晚上(跟診)</span>
             </div>
           </div>
         </div>
@@ -976,7 +976,7 @@ body {
             </div>
             <div class="time-block evening">
               <span class="time-icon">🌙</span>
-              <span class="time-text">晚上(關門留守)</span>
+              <span class="time-text">晚上</span>
             </div>
           </div>
         </div>
@@ -999,7 +999,7 @@ body {
             </div>
           </div>
           <div class="date-note">
-            本月： 6/7、6/21
+            本月： 8/9、8/23
           </div>
         </div>
       </div>
@@ -1014,31 +1014,44 @@ body {
     </h3>
     <div class="special-times">
       <div class="special-item">
-        <span class="date">6/14</span>
-        <span class="weekday">(六)</span>
-        <div class="time-block full">
-          <span class="time-icon">⏰</span>
-          <span class="time-text">全日休診</span>
-        </div>
-      </div>
-      <div class="special-item">
-        <span class="date">6/24</span>
+        <span class="date">8/26</span>
         <span class="weekday">(二)</span>
         <div class="time-block morning">
-          <span class="time-icon">⏰</span>
-          <span class="time-text">早上回診皮膚科</span>
+          <span class="time-icon">🏥</span>
+          <span class="time-text">早上皮膚科回診</span>
         </div>
       </div>
       <div class="special-item">
-        <span class="date">6/28</span>
-        <span class="weekday">(六)</span>
-        <div class="time-block full">
-          <span class="time-icon">⏰</span>
-          <span class="time-text">全日休診</span>
+        <span class="date">8/28</span>
+        <span class="weekday">(四)</span>
+        <div class="time-block evening">
+          <span class="time-icon">🌙</span>
+          <span class="time-text">晚上加診</span>
         </div>
       </div>
     </div>
   </div>
+  
+  <!-- 假日計畫卡片 -->
+  <div class="schedule-card holiday">
+    <h3 class="schedule-month">8月假日計畫</h3>
+    <div class="holiday-plans">
+      <div class="holiday-item">
+        <span class="calendar-icon">✈️</span>
+        <span class="date">8/16</span>
+        <span class="weekday">(六)</span>
+        <span class="event">旅遊</span>
+      </div>
+      
+      <div class="holiday-item">
+        <span class="calendar-icon">📦</span>
+        <span class="date">8/29-8/30</span>
+        <span class="weekday">(五-六)</span>
+        <span class="event">搬家</span>
+      </div>
+    </div>
+  </div>
+</div>
   
   
   <!-- 學術活動卡片 -->
@@ -1370,7 +1383,7 @@ const DailyOverview = () => {
   const getAcademicEvents = () => {
     const events = [];
     const month = today.getMonth() + 1; // JavaScript 月份從 0 開始
-    const monthContent = document.getElementById(month === 6 ? 'june' : 'july');
+    const monthContent = document.getElementById(month === 6 ? 'june' : month === 7 ? 'july' : 'august');
     
     if (!monthContent) return [];
     
@@ -1412,7 +1425,7 @@ const DailyOverview = () => {
   // 從 HTML 中獲取假日活動
   const getHolidayEvents = () => {
     const month = today.getMonth() + 1;
-    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    const monthContent = document.getElementById(month === 6 ? 'june' : month === 7 ? 'july' : 'august');if (tabId === 'july' || tabId === 'june') 
     
     if (!monthContent) return [];
     
@@ -1769,7 +1782,7 @@ function switchTab(tabId) {
   document.getElementById(tabId + '-tab').classList.add('active');
   
   // 如果切換到月份標籤，更新學術活動和假期狀態
-  if (tabId === 'july' || tabId === 'june') {
+  if (tabId === 'july' || tabId === 'june' || tabId === 'august') {
     checkPastEvents();
     checkHolidayEvents();
   }
