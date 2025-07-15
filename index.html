@@ -1300,7 +1300,7 @@ const DailyOverview = () => {
   const getAcademicEvents = () => {
     const events = [];
     const month = today.getMonth() + 1; // JavaScript 月份從 0 開始
-    const monthContent = document.getElementById(month === 8 ? 'august' : 'july');
+const monthContent = document.getElementById(month === 7 ? 'july' : 'august');
     
     if (!monthContent) return [];
     
@@ -1342,7 +1342,7 @@ const DailyOverview = () => {
   // 從 HTML 中獲取假日活動
   const getHolidayEvents = () => {
     const month = today.getMonth() + 1;
-    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+const monthContent = document.getElementById(month === 7 ? 'july' : 'august');
     
     if (!monthContent) return [];
     
@@ -1391,7 +1391,7 @@ const DailyOverview = () => {
     // 檢查是否為特殊時段
     const month = today.getMonth() + 1;
     const date = today.getDate();
-    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+   const monthContent = document.getElementById(month === 7 ? 'july' : 'august');
     
     if (!monthContent) return [];
     
@@ -1441,23 +1441,19 @@ const DailyOverview = () => {
       case 1: // 週一
         return ['早上(跟診)', '下午'];
       case 2: // 週二
-        if (month === 5) {
-          return ['早上', '下午(跟診)'];
-        } else {
-          return ['下午(跟診)', '晚上'];
-        }
-      case 3: // 週三
-        if (month === 5) {
-          return ['下午', '晚上'];
-        } else {
-          return ['下午', '晚上'];
-        }
-      case 4: // 週四
-        if (month === 5) {
-          return ['下午', '晚上'];
-        } else {
-          return ['早上', '下午'];
-        }
+  if (month === 7) {
+    return ['下午(跟診)', '晚上'];
+  } else {
+    return ['下午', '晚上'];
+  }
+case 3: // 週三
+  if (month === 7) {
+    return ['下午', '晚上'];
+  } else {
+    return ['下午(跟診)', '晚上(跟診)'];
+  }
+case 4: // 週四
+  return ['早上', '下午'];
       case 5: // 週五
         return ['早上', '晚上(關門留守)'];
       default:
@@ -1468,7 +1464,7 @@ const DailyOverview = () => {
   // 獲取下一個學術活動
   const getNextAcademicEvent = () => {
     const month = today.getMonth() + 1;
-    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    const monthContent = document.getElementById(month === 7 ? 'july' : 'august');
     
     if (!monthContent) return null;
     
@@ -1507,7 +1503,7 @@ const DailyOverview = () => {
   // 獲取下一個假日計畫
   const getNextHolidayPlan = () => {
     const month = today.getMonth() + 1;
-    const monthContent = document.getElementById(month === 5 ? 'may' : 'june');
+    const monthContent = document.getElementById(month === 7 ? 'july' : 'august');
     
     if (!monthContent) return null;
     
